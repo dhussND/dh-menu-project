@@ -17,15 +17,23 @@ const DiningHall = () => {
     fetchMeals();
   }, []);
 
+  // Format the dining hall name
+  const formattedDiningHall = diningHall
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
   return (
     <div>
-      <h1>{diningHall} Menu</h1>
+      <h1>{formattedDiningHall} Menu</h1>
       <p>Select a meal to view the menu:</p>
-      {meals.map((meal, index) => (
-        <Link key={index} to={`/${diningHall}/${meal}`}>
-          {meal}
-        </Link>
-      ))}
+      <ul>
+        {meals.map((meal, index) => (
+          <li key={index}>
+            <Link to={`/${diningHall}/${meal}`}>{meal}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

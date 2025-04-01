@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Parse from 'parse';
-import SearchBar from './SearchBar';
+import SearchBar from '../SearchBar';
 
 const Meal = () => {
   const { diningHall, meal } = useParams();

@@ -39,7 +39,7 @@ const AuthRegister = () => {
     
         if (userCreated) {
             alert(`${userCreated.get("firstName")}, you successfully registered!`);
-            navigate("/Home"); // redirect to homepage
+            navigate("/home"); // redirect to homepage
         }
     };
 

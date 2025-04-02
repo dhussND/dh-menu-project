@@ -1,17 +1,15 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { checkUser } from "../Auth/AuthService";
+import AuthModule from "../Auth/Auth.jsx";
+import { Route } from "react-router-dom";
 
-const ProtectedRoute = ({ element: Component }) => {
-    const navigate = useNavigate();
-
+// You can pass props using the spread operator to throw them on an object if there are too many to break out
+const ProtectedRoute = ({ element: Component, ...rest }) => {
     if (checkUser()) {
-        return <Component />;
+      return <Component {...rest} />;
     } else {
-        return (
-            <Navigate to="/auth" replace />
-        );
+      return <Route path="/auth" element={<AuthModule />} />
     }
-};
-
-export default ProtectedRoute;
+  };
+  
+  export default ProtectedRoute;

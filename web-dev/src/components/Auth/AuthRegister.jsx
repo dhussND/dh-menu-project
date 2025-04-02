@@ -13,33 +13,13 @@ const AuthRegister = () => {
         password: ""
     });
 
-    // flags in the state to watch for add/remove updates
-    const [add, setAdd] = useState(false);
-
     // redirect already authenticated users back to home
     useEffect(() => {
         if (checkUser()) {
             alert("You are already logged in");
-            navigate("/");
+            navigate("/Home");
         }
     }, [navigate]);
-
-    // useEffect that run when changes are made to the state variable flags
-    useEffect(() => {
-        // checkUser() ? history.push("/home"): null;
-        if (newUser && add) {
-            createUser(newUser).then((userCreated) => {
-                if (userCreated) {
-                    alert(
-                        `${userCreated.get("firstName")}, you successfully registered!`
-                    );
-                    navigate("/");
-                }
-                // TODO: redirect user to main app
-                setAdd(false);
-            });
-        }
-    }, [navigate, newUser, add]);
 
     const onChangeHandler = (e) => {
         e.preventDefault();
@@ -53,10 +33,14 @@ const AuthRegister = () => {
         });
     };
 
-    const onSubmitHandler = (e) => {
+    const onSubmitHandler = async (e) => {
         e.preventDefault();
-        console.log("submitted: ", e.target);
-        setAdd(true);
+        const userCreated = await createUser(newUser);
+    
+        if (userCreated) {
+            alert(`${userCreated.get("firstName")}, you successfully registered!`);
+            navigate("/Home"); // redirect to homepage
+        }
     };
 
     return (

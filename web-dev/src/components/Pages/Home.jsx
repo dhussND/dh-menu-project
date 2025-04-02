@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AuthLogout from '../Auth/AuthLogout';
 
 const Home = () => {
   return (
@@ -9,6 +10,8 @@ const Home = () => {
       <Link to="/north-dining-hall">North Dining Hall</Link>
       <br />
       <Link to="/south-dining-hall">South Dining Hall</Link>
+      <br />
+      <AuthLogout />
     </div>
   );
 };

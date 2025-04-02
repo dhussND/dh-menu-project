@@ -17,7 +17,7 @@ const AuthRegister = () => {
     useEffect(() => {
         if (checkUser()) {
             alert("You are already logged in");
-            navigate("/Home");
+            navigate("/home", { replace: true });
         }
     }, [navigate]);
 

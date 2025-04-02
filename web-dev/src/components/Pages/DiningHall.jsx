@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Parse from 'parse';
 
 const DiningHall = () => {
   const { diningHall } = useParams();
   const [meals, setMeals] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMeals = async () => {
@@ -34,6 +35,7 @@ const DiningHall = () => {
           </li>
         ))}
       </ul>
+      <button onClick={() => navigate(-1)}>Back</button>
     </div>
   );
 };

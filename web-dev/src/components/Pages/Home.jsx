@@ -1,37 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../../App.css';
 
 const Home = () => {
   return (
-    <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+    <div className="home-container">
       <h1>University Dining Hall Menu</h1>
       <p>Welcome to the university dining hall menu app. Select a dining hall to view the menu.</p>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', margin: '2rem 0' }}>
-        <Link 
-          to="/north-dining-hall"
-          style={{
-            padding: '1.5rem',
-            backgroundColor: '#1a1a1a',
-            borderRadius: '8px',
-            transition: 'all 0.3s ease',
-            fontSize: '1.2rem'
-          }}
-        >
-          North Dining Hall
+
+      <div className="home-buttons">
+        <Link to="/north-dining-hall">
+          <button className="dining-hall-button">North Dining Hall</button>
         </Link>
-        
-        <Link 
-          to="/south-dining-hall"
-          style={{
-            padding: '1.5rem',
-            backgroundColor: '#1a1a1a',
-            borderRadius: '8px',
-            transition: 'all 0.3s ease',
-            fontSize: '1.2rem'
-          }}
-        >
-          South Dining Hall
+
+        <Link to="/south-dining-hall">
+          <button className="dining-hall-button">South Dining Hall</button>
         </Link>
       </div>
     </div>

@@ -16,14 +16,29 @@ const AuthModule = () => {
     }, [navigate]);
 
     return (
-        <div className="auth-page">
-            <div className="auth-container" style={{ textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
+        <div className="auth-page" style={{ width: '100%' }}>
+            <div className="auth-container" style={{ 
+                textAlign: 'center', 
+                maxWidth: '500px', 
+                margin: '0 auto',
+                width: '100%',
+                padding: '0 1rem'
+            }}>
                 <h1>Welcome to Notre Dame Dining Hall Menus</h1>
-                <p style={{ marginBottom: '2rem' }}>
+                <p style={{ 
+                    marginBottom: '2rem',
+                    fontSize: '1.1rem',
+                    lineHeight: '1.6'
+                }}>
                     Access dining menus for North and South Dining Halls.
                     Please log in or register to continue.
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '1rem',
+                    width: '100%'
+                }}>
                     <Link to="/auth/register">
                         <button className="btn-primary" style={{ width: '100%' }}>Register</button>
                     </Link>

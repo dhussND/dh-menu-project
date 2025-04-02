@@ -18,9 +18,21 @@ import '../Styles/Auth.css';
 export default function Components() {
     return (
         <Router>
-            <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
+            <div style={{ 
+                maxWidth: '800px', 
+                margin: '0 auto', 
+                padding: '0 1rem',
+                minHeight: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
                 <Navbar />
-                <main style={{ textAlign: 'center' }}>
+                <main style={{ 
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center'
+                }}>
                     <Routes>
                         <Route path="/auth" element={<AuthModule />} />
                         <Route path="/auth/register" element={<AuthRegister />} />

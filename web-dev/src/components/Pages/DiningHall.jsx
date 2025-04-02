@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import Parse from 'parse';
 
 const DiningHall = () => {
   const { diningHall } = useParams();
   const [meals, setMeals] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMeals = async () => {
@@ -25,17 +24,30 @@ const DiningHall = () => {
     .join(' ');
 
   return (
-    <div>
+    <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
       <h1>{formattedDiningHall} Menu</h1>
       <p>Select a meal to view the menu:</p>
-      <ul>
+      
+      <div style={{ margin: '2rem 0', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {meals.map((meal, index) => (
-          <li key={index}>
-            <Link to={`/${diningHall}/${meal}`}>{meal}</Link>
-          </li>
+          <Link 
+            key={index} 
+            to={`/${diningHall}/${meal}`}
+            style={{
+              padding: '1rem',
+              backgroundColor: '#1a1a1a',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            {meal}
+          </Link>
         ))}
-      </ul>
-      <button onClick={() => navigate(-1)}>Back</button>
+      </div>
+      
+      <Link to="/home">
+        <button style={{ marginTop: '1rem' }}>Back to Home</button>
+      </Link>
     </div>
   );
 };

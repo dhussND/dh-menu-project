@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import Parse from 'parse';
 import SearchBar from '../SearchBar';
 
@@ -55,27 +55,39 @@ const Meal = () => {
     .filter(station => station.items.length > 0);
 
   return (
-    <div>
+    <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
       <h1>{meal} at {formattedDiningHall}</h1>
       <SearchBar
         placeholder="Search for a food item or station..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      {filteredStations.map((station, index) => (
-        <div key={index} style={{ marginBottom: '20px' }}>
-          <details>
-            <summary style={{ fontWeight: 'bold', cursor: 'pointer' }}>
-              {station.name}
-            </summary>
-            <ul>
-              {station.items.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </details>
-        </div>
-      ))}
+      
+      <div style={{ textAlign: 'left', marginTop: '2rem' }}>
+        {filteredStations.map((station, index) => (
+          <div key={index} style={{ marginBottom: '20px' }}>
+            <details>
+              <summary style={{ fontWeight: 'bold', cursor: 'pointer', padding: '0.5rem', backgroundColor: '#1a1a1a', borderRadius: '4px' }}>
+                {station.name}
+              </summary>
+              <ul style={{ marginTop: '0.5rem', paddingLeft: '2rem' }}>
+                {station.items.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </details>
+          </div>
+        ))}
+      </div>
+      
+      <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+        <Link to={`/${diningHall}`}>
+          <button>Back to {formattedDiningHall}</button>
+        </Link>
+        <Link to="/home">
+          <button>Back to Home</button>
+        </Link>
+      </div>
     </div>
   );
 };

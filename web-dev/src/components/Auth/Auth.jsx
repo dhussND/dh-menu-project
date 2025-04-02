@@ -17,15 +17,20 @@ const AuthModule = () => {
 
     return (
         <div className="auth-page">
-            <div className="auth-container">
-                <Link to="/auth/register">
-                    <button>Register</button>
-                </Link>
-                <br />
-                <br />
-                <Link to="/auth/login">
-                    <button>Login</button>
-                </Link>
+            <div className="auth-container" style={{ textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
+                <h1>Welcome to Notre Dame Dining Hall Menus</h1>
+                <p style={{ marginBottom: '2rem' }}>
+                    Access dining menus for North and South Dining Halls.
+                    Please log in or register to continue.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <Link to="/auth/register">
+                        <button className="btn-primary" style={{ width: '100%' }}>Register</button>
+                    </Link>
+                    <Link to="/auth/login">
+                        <button className="btn-primary" style={{ width: '100%' }}>Login</button>
+                    </Link>
+                </div>
             </div>
         </div>
     );

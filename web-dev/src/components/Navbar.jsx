@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLogout from './Auth/AuthLogout';
 import { checkUser } from './Auth/AuthService';
 import '../App.css';
 
 const Navbar = () => {
-  const isLoggedIn = checkUser();
+  const [isLoggedIn, setIsLoggedIn] = useState(checkUser());
+
+  // Keep checking auth state when route or login status might change
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentStatus = checkUser();
+      setIsLoggedIn(currentStatus);
+    }, 1000); // check every second (can reduce this if needed)
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <nav className="navbar">
@@ -20,7 +30,7 @@ const Navbar = () => {
           <Link to="/home" className="nav-link">Home</Link>
           <Link to="/north-dining-hall" className="nav-link">North</Link>
           <Link to="/south-dining-hall" className="nav-link">South</Link>
-          <AuthLogout />
+          <AuthLogout onLogout={() => setIsLoggedIn(false)} />
         </div>
       ) : (
         <div className="nav-links">

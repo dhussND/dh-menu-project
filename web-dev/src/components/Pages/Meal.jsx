@@ -8,11 +8,25 @@ const Meal = () => {
   const { diningHall, meal } = useParams();
   const [stations, setStations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentDate, setCurrentDate] = useState('');
+
+  const formattedDiningHall = diningHall
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 
   useEffect(() => {
     const fetchStations = async () => {
+      // Format today's date in "Monday, April 21, 2025" format to match the database
+      const today = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedDate = today.toLocaleDateString('en-US', options);
+      setCurrentDate(formattedDate);
+
       const query = new Parse.Query('Menu');
       query.equalTo('meal', meal);
+      query.equalTo('date', formattedDate);
+      query.equalTo('diningHall', formattedDiningHall);
       const results = await query.find();
 
       const groupedStations = results.reduce((acc, result) => {
@@ -34,12 +48,7 @@ const Meal = () => {
     };
 
     fetchStations();
-  }, [meal]);
-
-  const formattedDiningHall = diningHall
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  }, [meal, diningHall, formattedDiningHall]);
 
   const filteredStations = stations
     .map(station => ({
@@ -54,6 +63,7 @@ const Meal = () => {
   return (
     <div className="menu-page">
       <h1>{meal} at {formattedDiningHall}</h1>
+      <p>Menu for {currentDate}</p>
       <SearchBar
         className="search-bar"
         placeholder="Search for a food item or station..."
@@ -61,16 +71,20 @@ const Meal = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      {filteredStations.map((station, index) => (
-        <details key={index} className="menu-section">
-          <summary>{station.name}</summary>
-          <ul>
-            {station.items.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
-        </details>
-      ))}
+      {filteredStations.length > 0 ? (
+        filteredStations.map((station, index) => (
+          <details key={index} className="menu-section">
+            <summary>{station.name}</summary>
+            <ul>
+              {station.items.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </details>
+        ))
+      ) : (
+        <p>No menu items available for today.</p>
+      )}
 
       <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
         <Link to={`/${diningHall}`}>

@@ -117,6 +117,7 @@ def upload_to_back4app(menu_data):
 
     try:
         # Delete existing records for today
+        # This is not necessary. Only included for testing for when script is executed multiple times in one day.
         today = datetime.today().strftime("%A, %B %-d, %Y")
         query = {
             "where": json.dumps({

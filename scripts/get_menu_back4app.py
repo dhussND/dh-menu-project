@@ -71,6 +71,14 @@ def get_menu():
                             "date": date,
                             "diningHall": "South Dining Hall"
                         })
+                    if current_station and current_items:
+                        food_by_stations.append({
+                            "meal": meal,
+                            "station": current_station,
+                            "items": current_items.copy(),
+                            "date": date,
+                            "diningHall": "North Dining Hall"
+                        })
                     current_station = tds[0].text
                     current_items = []
                 else:
@@ -85,6 +93,14 @@ def get_menu():
                     "items": current_items,
                     "date": date,
                     "diningHall": "South Dining Hall"
+                })
+            if current_station and current_items:
+                food_by_stations.append({
+                    "meal": meal,
+                    "station": current_station,
+                    "items": current_items,
+                    "date": date,
+                    "diningHall": "North Dining Hall"
                 })
 
             back_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "btn_Back1")))

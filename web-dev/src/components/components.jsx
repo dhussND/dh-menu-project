@@ -13,7 +13,7 @@ import Navbar from "./Navbar.jsx";
 import Home from "./Pages/Home.jsx";
 import DiningHall from './Pages/DiningHall.jsx';
 import Meal from './Pages/Meal.jsx';
-import '../Styles/theme.css';
+import '../styles/theme.css';
 
 export default function Components() {
     return (

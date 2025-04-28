@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLogout from './Auth/AuthLogout';
 import { checkUser } from './Auth/AuthService';
-import '../Styles/theme.css';
+import '../styles/theme.css';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(checkUser());

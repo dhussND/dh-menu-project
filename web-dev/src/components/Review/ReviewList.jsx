@@ -8,6 +8,7 @@ export default function ReviewList({ reviews }) {
     return <p className="text-muted small mt-2">No reviews yet. Be the first!</p>;
   }
 
+  // Sort reviews by createdAt date in descending order
   return (
     <ul className="list-group mt-2">
       {reviews.map((r, idx) => (

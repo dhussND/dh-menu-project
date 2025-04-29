@@ -1,5 +1,3 @@
-// src/components/Auth/AuthForm.jsx
-
 import React from "react";
 
 const AuthForm = ({ user, isLogin, onChange, onSubmit }) => {

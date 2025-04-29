@@ -26,9 +26,7 @@ h5 {
     margin-bottom: 0.5rem;
 }
 
-/* ===========================
-     Navbar
-  =========================== */
+/* Navbar */
 .nd-navbar {
     background-color: var(--nd-blue);
     color: white;
@@ -68,9 +66,7 @@ h5 {
     color: var(--nd-gold);
 }
 
-/* ===========================
-     Auth Layout (Login/Register)
-  =========================== */
+/* Auth Layout (Login/Register) */
 .auth-landing {
     display: flex;
     justify-content: center;
@@ -199,9 +195,7 @@ h5 {
     margin-bottom: 1rem;
 }
 
-/* ===========================
-     Search Bar
-  =========================== */
+/* Search Bar */
 .nd-search {
     background-color: var(--nd-blue);
     color: white;
@@ -223,9 +217,7 @@ h5 {
     background-color: #0b1d36;
 }
 
-/* ===========================
-     Review Cards / Station Menus
-  =========================== */
+/* Review Cards / Station Menus */
 .menu-section summary {
     font-weight: bold;
     font-size: 1.2rem;

@@ -7,12 +7,14 @@ import ReviewForm from "./ReviewForm";
 import ReviewList from "./ReviewList";
 
 export default function MenuItemReview({ foodItem, station, diningHall }) {
+  // establish Parse connection
   const [showForm, setShowForm] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(null);
   const [reviewsCount, setReviewsCount] = useState(0);
 
+  // fetch reviews when component mounts or when showReviews changes
   const fetchReviews = async () => {
     const query = new Parse.Query("Reviews");
     query.equalTo("foodItem", foodItem);
@@ -20,6 +22,7 @@ export default function MenuItemReview({ foodItem, station, diningHall }) {
     query.descending("createdAt");
     const results = await query.find();
 
+    // set reviews
     const fetchedReviews = results.map((r) => ({
       text: r.get("reviewText"),
       rating: r.get("rating"),
@@ -28,6 +31,7 @@ export default function MenuItemReview({ foodItem, station, diningHall }) {
 
     setReviews(fetchedReviews);
 
+    // calculate average rating
     if (fetchedReviews.length > 0) {
       const avg = fetchedReviews.reduce((sum, r) => sum + r.rating, 0) / fetchedReviews.length;
       setAverageRating(avg.toFixed(1));
@@ -38,6 +42,7 @@ export default function MenuItemReview({ foodItem, station, diningHall }) {
     }
   };
 
+  
   const handleToggleReviews = () => {
     if (!showReviews) {
       fetchReviews();
@@ -55,6 +60,7 @@ export default function MenuItemReview({ foodItem, station, diningHall }) {
     }
   };
 
+  // return the interaction buttons and the review form
   return (
     <div style={{ marginTop: "0.5rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>

@@ -6,6 +6,7 @@ import '../../styles/theme.css';
 import MenuItemReview from '../Review/MenuItemReview';
 
 const Meal = () => {
+  // get the dining hall and meal from the URL parameters
   const { diningHall, meal } = useParams();
   const [stations, setStations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +17,7 @@ const Meal = () => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
+  // fetch the menu items when the component mounts or when the meal/dining hall changes
   useEffect(() => {
     const fetchStations = async () => {
       const today = new Date();
@@ -49,6 +51,7 @@ const Meal = () => {
     fetchStations();
   }, [meal, diningHall, formattedDiningHall]);
 
+  // filter stations based on the search query
   const filteredStations = stations
     .map(station => ({
       ...station,

@@ -1,5 +1,3 @@
-// src/components/Auth/AuthLogin.jsx
-
 import React, { useEffect, useState } from "react";
 import { checkUser, loginUser } from "./AuthService";
 import AuthForm from "./AuthForm";

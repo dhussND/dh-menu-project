@@ -8,6 +8,7 @@ const DiningHall = () => {
   const [meals, setMeals] = useState([]);
   const [currentDate, setCurrentDate] = useState('');
 
+  // format dining hall name
   const formattedDiningHall = diningHall
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -33,6 +34,7 @@ const DiningHall = () => {
     fetchMeals();
   }, [formattedDiningHall]);
 
+  // format the current date
   return (
     <div className="home-container">
       <h1>{formattedDiningHall} Menu</h1>

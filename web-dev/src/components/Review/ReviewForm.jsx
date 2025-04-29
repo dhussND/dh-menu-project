@@ -6,6 +6,7 @@ const ReviewForm = ({ onReviewSubmit, foodItem, station, diningHall }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
 
+  // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -18,6 +19,7 @@ const ReviewForm = ({ onReviewSubmit, foodItem, station, diningHall }) => {
     const currentUser = Parse.User.current();
     const username = currentUser ? currentUser.get("firstName") : "Anonymous";
 
+    // set review properties
     review.set("reviewText", reviewText);
     review.set("rating", rating);
     review.set("foodItem", foodItem);
@@ -25,6 +27,7 @@ const ReviewForm = ({ onReviewSubmit, foodItem, station, diningHall }) => {
     review.set("diningHall", diningHall);
     review.set("username", username);
 
+    // save review to Parse
     try {
       await review.save();
       onReviewSubmit();
@@ -43,6 +46,7 @@ const ReviewForm = ({ onReviewSubmit, foodItem, station, diningHall }) => {
     return "empty";
   };
 
+  // handle mouse events for star rating
   const handleMouseMove = (e, index) => {
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - left;
@@ -53,6 +57,7 @@ const ReviewForm = ({ onReviewSubmit, foodItem, station, diningHall }) => {
     }
   };
 
+  // handle click event for star rating
   const handleClick = (e, index) => {
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - left;

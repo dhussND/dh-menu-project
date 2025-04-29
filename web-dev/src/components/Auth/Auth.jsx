@@ -1,5 +1,3 @@
-// src/components/Auth/Auth.jsx
-
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { checkUser } from "./AuthService";

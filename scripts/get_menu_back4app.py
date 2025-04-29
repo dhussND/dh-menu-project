@@ -16,6 +16,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+LOW_PRIORITY_STATIONS = [
+    'Grill Buns', 'Asian Stir Fry Sauces', 'Deli', 'Condiments',
+    'Coffee & Tea', 'Fountain Drinks', 'Milk', 'Juices',
+    'Toppings', 'Waffle and Pancake Toppings'
+]
+
+def reorder_stations(menu_data):
+    return sorted(
+        menu_data, 
+        key=lambda x: (x['station'] in LOW_PRIORITY_STATIONS, )
+    )
+
 def get_menu():
     chrome_options = Options()
     chrome_options.add_argument("--disable-gpu")
@@ -131,8 +143,7 @@ def upload_to_back4app(menu_data):
     base_url = f"{os.getenv('BACK4APP_SERVER_URL')}/classes/Menu"
 
     try:
-        # Delete existing records for today
-        # Not necessary, only included for testing for when script is executed multiple times in one day.
+        # delete existing records for today; not necessary, only included for testing for when script is executed multiple times in one day
         today = datetime.today().strftime("%A, %B %-d, %Y")
         query = {
             "where": json.dumps({
@@ -150,7 +161,7 @@ def upload_to_back4app(menu_data):
                 delete_url = f"{base_url}/{record['objectId']}"
                 requests.delete(delete_url, headers=headers)
 
-        # Upload new records
+        # upload new records
         success_count = 0
         for item in menu_data:
             response = requests.post(base_url, headers=headers, json=item)
@@ -174,6 +185,10 @@ def main():
         
         if menu_data:
             print(f"Scraped {len(menu_data)} menu items")
+
+            # prioritize stations
+            menu_data = reorder_stations(menu_data)
+
             print("Uploading to Back4App...")
             if upload_to_back4app(menu_data):
                 print("Upload successful!")

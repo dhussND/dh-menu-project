@@ -13,6 +13,16 @@ Changed
 Fixed
 (Future bug fixes can be listed here.)
 
+[0.4.0] - 2025-04-29
+Added
+- Added call to Parse API to automatically upload scraped data to back4app db.
+- Created GitHub Action to automatically scrape and upload data every day at midnight.
+- Added station prioritization to push lower priority stations to the botttom of the list, allowing users to see most relevant stations first.
+- Added user reviews feature allowing users to review food items.
+
+Changed
+- Changed styling to match Notre Dame colors and other improvements.
+
 
 [0.3.0] - 2025-04-02
 

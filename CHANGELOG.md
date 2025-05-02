@@ -24,6 +24,21 @@ Changed
 - Changed styling to match Notre Dame colors and other improvements.
 
 
+[0.4.0] - 2025-04-27
+Added
+- Daily updates to menu via GitHub action that runs every night at midnight
+- Menu item searching was added so users can quickly locate various stations or menu items
+- User reviews have been implemented, allowing users to interact with the website more and give their opinions
+
+Changed
+- Edited python scripts to more correctly parse menu data and run daily
+- UI was changed to look more Notre Dame themed, using Notre Dame colors and fonts
+
+Fixed
+- Resolved issues with review submission not refreshing properly after form submission
+- Fixed search bar alignment and visibility issues between views
+- Resolved bug where star rating did not render correctly when reviews were hidden
+
 [0.3.0] - 2025-04-02
 
 Added

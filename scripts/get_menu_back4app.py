@@ -28,7 +28,7 @@ def reorder_stations(menu_data):
         key=lambda x: (x['station'] in LOW_PRIORITY_STATIONS, )
     )
 
-def get_menu():
+def get_menu(dining_hall):
     chrome_options = Options()
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
@@ -41,8 +41,8 @@ def get_menu():
         url = 'https://dining.nd.edu/'
         driver.get(url)
 
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'South Dining Hall')]"))).click()
-        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, "South Dining Hall"))).click()
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//a[contains(text(), 'South Dining Hall')]"))).click()
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, dining_hall))).click()
         menu_container = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "cbo_nn_menuCell")))
 
         todays_date = datetime.today().strftime("%A, %B %-d, %Y")
@@ -81,15 +81,7 @@ def get_menu():
                             "station": current_station,
                             "items": current_items.copy(),
                             "date": date,
-                            "diningHall": "South Dining Hall"
-                        })
-                    if current_station and current_items:
-                        food_by_stations.append({
-                            "meal": meal,
-                            "station": current_station,
-                            "items": current_items.copy(),
-                            "date": date,
-                            "diningHall": "North Dining Hall"
+                            "diningHall": dining_hall
                         })
                     current_station = tds[0].text
                     current_items = []
@@ -104,15 +96,7 @@ def get_menu():
                     "station": current_station,
                     "items": current_items,
                     "date": date,
-                    "diningHall": "South Dining Hall"
-                })
-            if current_station and current_items:
-                food_by_stations.append({
-                    "meal": meal,
-                    "station": current_station,
-                    "items": current_items,
-                    "date": date,
-                    "diningHall": "North Dining Hall"
+                    "diningHall": dining_hall
                 })
 
             back_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "btn_Back1")))
@@ -178,28 +162,30 @@ def upload_to_back4app(menu_data):
         return False
 
 def main():
-    start_time = time.time()
-    try:
-        print("Starting menu scraping...")
-        menu_data = get_menu()
-        
-        if menu_data:
-            print(f"Scraped {len(menu_data)} menu items")
+    dining_halls = ["South Dining Hall",  "North Dining Hall", "Holy Cross College Dining Hall", "Saint Mary's Dining Hall"]
+    for dining_hall in dining_halls:
+        start_time = time.time()
+        try:
+            print("Starting menu scraping...")
+            menu_data = get_menu(dining_hall)
+            
+            if menu_data:
+                print(f"Scraped {len(menu_data)} menu items")
 
-            # prioritize stations
-            menu_data = reorder_stations(menu_data)
+                # prioritize stations
+                menu_data = reorder_stations(menu_data)
 
-            print("Uploading to Back4App...")
-            if upload_to_back4app(menu_data):
-                print("Upload successful!")
+                print("Uploading to Back4App...")
+                if upload_to_back4app(menu_data):
+                    print("Upload successful!")
+                else:
+                    print("Upload completed with errors")
             else:
-                print("Upload completed with errors")
-        else:
-            print("Failed to scrape menu data")
-    except Exception as e:
-        print(f"Fatal error: {e}")
-    finally:
-        print(f"Completed in {time.time() - start_time:.2f} seconds")
+                print("Failed to scrape menu data")
+        except Exception as e:
+            print(f"Fatal error: {e}")
+        finally:
+            print(f"Completed in {time.time() - start_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()

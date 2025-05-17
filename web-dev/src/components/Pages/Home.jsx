@@ -1,8 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getAvailableDiningHalls } from '../../api/menu';
 import '../../styles/theme.css';
 
 const Home = () => {
+  const [availableDiningHalls, setAvailableDiningHalls] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDiningHalls = async () => {
+      try {
+        const halls = await getAvailableDiningHalls();
+        setAvailableDiningHalls(halls);
+      } catch (error) {
+        console.error('Error fetching dining halls:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDiningHalls();
+  }, []);
+
+  const getDiningHallPath = (diningHall) => {
+    return `/${diningHall.toLowerCase().replace(/\s+/g, '-')}`;
+  };
+
   return (
     <div className="home-container">
       <h1>University Dining Hall Menu</h1>
@@ -13,12 +36,17 @@ const Home = () => {
       </p>
 
       <div className="home-buttons">
-        <Link to="/north-dining-hall">
-          <button className="btn-auth btn-dining">North Dining Hall</button>
-        </Link>
-        <Link to="/south-dining-hall">
-          <button className="btn-auth btn-dining">South Dining Hall</button>
-        </Link>
+        {loading ? (
+          <p>Loading available dining halls...</p>
+        ) : availableDiningHalls.length > 0 ? (
+          availableDiningHalls.map((diningHall) => (
+            <Link key={diningHall} to={getDiningHallPath(diningHall)}>
+              <button className="btn-auth btn-dining">{diningHall}</button>
+            </Link>
+          ))
+        ) : (
+          <p>No dining halls available for today.</p>
+        )}
       </div>
     </div>
   );

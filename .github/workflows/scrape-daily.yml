@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      BACK4APP_APP_ID: JYuuToLFr527wvq3Be7oWjWgA86bvvrIridk2kC6
-      BACK4APP_REST_API_KEY: 4zyD4yvlZO0Mz3QJF0EJHvIqflZWxWA0OF5sfIaj
-      BACK4APP_MASTER_KEY: gQsAz4ZUd9Xe0TlXakaxIJ3giYmHqMzw1Yi3duVs
+      BACK4APP_APP_ID: ${{ secrets.BACK4APP_APP_ID }}
+      BACK4APP_REST_API_KEY: ${{ secrets.BACK4APP_REST_API_KEY }}
+      BACK4APP_MASTER_KEY: ${{ secrets.BACK4APP_MASTER_KEY }}
       BACK4APP_SERVER_URL: https://parseapi.back4app.com
 
     steps:

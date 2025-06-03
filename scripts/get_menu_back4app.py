@@ -5,6 +5,7 @@ import os
 import time
 import requests
 from datetime import datetime
+import pytz
 from collections import defaultdict
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -15,6 +16,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Set timezone to Eastern Time (Notre Dame's timezone)
+eastern = pytz.timezone('America/New_York')
 
 LOW_PRIORITY_STATIONS = [
     'Grill Buns', 'Asian Stir Fry Sauces', 'Deli', 'Condiments',
@@ -45,9 +49,14 @@ def get_menu(dining_hall):
         WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, dining_hall))).click()
         menu_container = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "cbo_nn_menuCell")))
 
-        todays_date = datetime.today().strftime("%A, %B %-d, %Y")
+        # Get today's date in Eastern Time
+        todays_date = datetime.now(eastern).strftime("%A, %B %-d, %Y")
+        print(f"Searching for menu for: {todays_date}")
 
         def get_menu_for_correct_day(menu_container):
+            available_dates = [cell.text.split('\n')[0] for cell in menu_container]
+            print(f"Available dates: {available_dates}")
+            
             for i in range(len(menu_container)):
                 if menu_container[i].text.split('\n')[0] == todays_date:
                     return menu_container[i]
@@ -118,6 +127,13 @@ def upload_to_back4app(menu_data):
         print("No data to upload")
         return False
 
+    # Verify environment variables
+    required_vars = ['BACK4APP_APP_ID', 'BACK4APP_REST_API_KEY', 'BACK4APP_MASTER_KEY', 'BACK4APP_SERVER_URL']
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        print(f"Missing required environment variables: {', '.join(missing_vars)}")
+        return False
+
     headers = {
         "X-Parse-Application-Id": os.getenv('BACK4APP_APP_ID'),
         "X-Parse-REST-API-Key": os.getenv('BACK4APP_REST_API_KEY'),
@@ -127,8 +143,8 @@ def upload_to_back4app(menu_data):
     base_url = f"{os.getenv('BACK4APP_SERVER_URL')}/classes/Menu"
 
     try:
-        # delete existing records for today; not necessary, only included for testing for when script is executed multiple times in one day
-        today = datetime.today().strftime("%A, %B %-d, %Y")
+        # delete existing records for today
+        today = datetime.now(eastern).strftime("%A, %B %-d, %Y")
         query = {
             "where": json.dumps({
                 "date": today,
@@ -143,7 +159,9 @@ def upload_to_back4app(menu_data):
             print(f"Found {len(existing_records)} existing records, deleting...")
             for record in existing_records:
                 delete_url = f"{base_url}/{record['objectId']}"
-                requests.delete(delete_url, headers=headers)
+                delete_response = requests.delete(delete_url, headers=headers)
+                if delete_response.status_code != 200:
+                    print(f"Failed to delete record {record['objectId']}: {delete_response.text}")
 
         # upload new records
         success_count = 0
@@ -152,13 +170,15 @@ def upload_to_back4app(menu_data):
             if response.status_code == 201:
                 success_count += 1
             else:
-                print(f"Failed to upload {item['meal']}: {response.text}")
+                print(f"Failed to upload {item['meal']} at {item['station']}: {response.text}")
 
         print(f"Successfully uploaded {success_count}/{len(menu_data)} items")
         return success_count == len(menu_data)
 
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         print(f"Upload error: {e}")
+        if hasattr(e.response, 'text'):
+            print(f"Response text: {e.response.text}")
         return False
 
 def main():

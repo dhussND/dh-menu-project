@@ -31,7 +31,7 @@ export const loginUser = (currUser) => {
     console.log("User: ", user);
     console.log();
     return user
-        .logIn(user.email, user.password)
+        .logIn(currUser.email, currUser.password)
         .then((currUserSaved) => {
             return currUserSaved;
         })

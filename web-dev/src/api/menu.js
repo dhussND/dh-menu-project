@@ -8,6 +8,12 @@ export const getAvailableDiningHalls = async () => {
     
     const query = new Parse.Query('Menu');
     query.equalTo('date', formattedDate);
+    // Fetch all records for the date to ensure all dining halls are accounted for
+    // Parse's default limit of 100 results can exclude halls when one hall has
+    // more than 100 menu items.
+    query.limit(1000);
+    // Only request the diningHall field to minimize data transfer
+    query.select('diningHall');
     const results = await query.find();
     
     // Get unique dining halls

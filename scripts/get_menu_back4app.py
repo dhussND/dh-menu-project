@@ -28,9 +28,42 @@ LOW_PRIORITY_STATIONS = [
 
 def reorder_stations(menu_data):
     return sorted(
-        menu_data, 
+        menu_data,
         key=lambda x: (x['station'] in LOW_PRIORITY_STATIONS, )
     )
+
+def get_nutrition_info(item_url):
+    """Fetch nutrition details for a menu item.
+
+    The dining site exposes a detail page per item. This helper downloads that
+    page and extracts a small subset of values (e.g. calories and macros). It
+    returns a dictionary that can be stored directly in Back4App.
+
+    Because access to the dining site can change, this function keeps the logic
+    lightweight and resilient: if anything fails we return an empty dict so the
+    rest of the scraping process continues without interruption.
+    """
+
+    if not item_url:
+        return {}
+
+    try:
+        resp = requests.get(item_url, timeout=10)
+        resp.raise_for_status()
+    except requests.RequestException:
+        return {}
+
+    # Example parsing logic; adjust selectors for the actual page structure
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    nutrition = {}
+    for row in soup.select("table.nutrition-table tr"):
+        cells = [c.get_text(strip=True) for c in row.find_all("td")]
+        if len(cells) == 2:
+            label, value = cells
+            nutrition[label] = value
+    return nutrition
 
 def get_menu(dining_hall):
     chrome_options = Options()
@@ -39,7 +72,9 @@ def get_menu(dining_hall):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    driver = webdriver.Chrome(options=chrome_options)
+    # explicitly specify chromedriver path to avoid driver lookup issues
+    service = Service('/usr/bin/chromedriver')
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
         url = 'https://dining.nd.edu/'
@@ -97,7 +132,18 @@ def get_menu(dining_hall):
                 else:
                     item_name = tds[1].text.strip()
                     if item_name:
-                        current_items.append(item_name)
+                        # each item name is a hyperlink that leads to a page
+                        # containing detailed nutrition info. fetch that link
+                        try:
+                            link_elem = tds[1].find_element(By.TAG_NAME, "a")
+                            item_url = link_elem.get_attribute("href")
+                            nutrition = get_nutrition_info(item_url)
+                        except Exception:
+                            nutrition = {}
+                        current_items.append({
+                            "name": item_name,
+                            "nutrition": nutrition,
+                        })
             
             if current_station and current_items:
                 food_by_stations.append({

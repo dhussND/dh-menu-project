@@ -108,6 +108,7 @@ def get_menu(dining_hall):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
+
     # let selenium locate chromedriver automatically for portability
     service = Service()
     driver = webdriver.Chrome(service=service, options=chrome_options)

@@ -3,10 +3,9 @@
 import json
 import os
 import time
-import requests
 from datetime import datetime
 import pytz
-from collections import defaultdict
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -32,37 +31,74 @@ def reorder_stations(menu_data):
         key=lambda x: (x['station'] in LOW_PRIORITY_STATIONS, )
     )
 
-def get_nutrition_info(item_url):
-    """Fetch nutrition details for a menu item.
-
-    The dining site exposes a detail page per item. This helper downloads that
-    page and extracts a small subset of values (e.g. calories and macros). It
-    returns a dictionary that can be stored directly in Back4App.
-
-    Because access to the dining site can change, this function keeps the logic
-    lightweight and resilient: if anything fails we return an empty dict so the
-    rest of the scraping process continues without interruption.
-    """
-
-    if not item_url:
-        return {}
-
-    try:
-        resp = requests.get(item_url, timeout=10)
-        resp.raise_for_status()
-    except requests.RequestException:
-        return {}
-
-    # Example parsing logic; adjust selectors for the actual page structure
+def _parse_nutrition_label(html):
+    """Parse HTML from the nutrition pop-up into a dictionary."""
     from bs4 import BeautifulSoup
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
     nutrition = {}
-    for row in soup.select("table.nutrition-table tr"):
-        cells = [c.get_text(strip=True) for c in row.find_all("td")]
-        if len(cells) == 2:
-            label, value = cells
-            nutrition[label] = value
+
+    serving = soup.find("td", class_="cbo_nn_LabelBottomBorderLabel")
+    if serving:
+        nutrition["Serving Size"] = serving.get_text(strip=True).replace(
+            "Serving Size:", ""
+        ).strip()
+
+    labels = [
+        "Calories",
+        "Calories from Fat",
+        "Total Fat",
+        "Saturated Fat",
+        "Cholesterol",
+        "Sodium",
+        "Potassium",
+        "Total Carbohydrate",
+        "Dietary Fiber",
+        "Sugars",
+        "Protein",
+    ]
+
+    for label in labels:
+        label_span = soup.find("span", string=lambda t: t and label in t)
+        if label_span:
+            value_span = label_span.find_next("span", class_="cbo_nn_SecondaryNutrient")
+            if value_span:
+                nutrition[label] = value_span.get_text(strip=True).replace("\xa0", "")
+
+    ingredients_label = soup.find("span", class_="cbo_nn_LabelIngredientsBold")
+    if ingredients_label:
+        ingredients_span = ingredients_label.find_next(
+            "span", class_="cbo_nn_LabelIngredients"
+        )
+        if ingredients_span:
+            nutrition["Ingredients"] = ingredients_span.get_text(strip=True)
+
+    return nutrition
+
+
+def get_nutrition_info(driver, link_elem):
+    """Open a menu item to scrape its nutrition information."""
+    try:
+        driver.execute_script("arguments[0].click();", link_elem)
+        WebDriverWait(driver, 5).until(
+            EC.visibility_of_element_located((By.ID, "nutritionLabel"))
+        )
+        html = driver.find_element(By.ID, "nutritionLabel").get_attribute(
+            "innerHTML"
+        )
+        nutrition = _parse_nutrition_label(html)
+    except Exception:
+        nutrition = {}
+    finally:
+        try:
+            close_btn = driver.find_element(By.ID, "btn_nn_detail_close")
+            close_btn.click()
+            WebDriverWait(driver, 5).until(
+                EC.invisibility_of_element_located((By.ID, "nutritionLabel"))
+            )
+        except Exception:
+            pass
+
     return nutrition
 
 def get_menu(dining_hall):
@@ -72,8 +108,8 @@ def get_menu(dining_hall):
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    # explicitly specify chromedriver path to avoid driver lookup issues
-    service = Service('/usr/bin/chromedriver')
+    # let selenium locate chromedriver automatically for portability
+    service = Service()
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
@@ -136,8 +172,7 @@ def get_menu(dining_hall):
                         # containing detailed nutrition info. fetch that link
                         try:
                             link_elem = tds[1].find_element(By.TAG_NAME, "a")
-                            item_url = link_elem.get_attribute("href")
-                            nutrition = get_nutrition_info(item_url)
+                            nutrition = get_nutrition_info(driver, link_elem)
                         except Exception:
                             nutrition = {}
                         current_items.append({

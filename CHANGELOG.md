@@ -3,16 +3,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+
 [Unreleased] - yyyy-mm-dd
 Added
 (Future features or improvements can be listed here.)
-- Scraper now captures nutrition information for each menu item and stores it in Back4App.
 
 Changed
 (Future changes or refactoring can be listed here.)
 
 Fixed
 (Future bug fixes can be listed here.)
+
+[0.5.0] - 2025-06-04
+Added
+- Scraper now captures nutrition information for each menu item by clicking the item and parsing the pop-up label.
+Changed
+- Chromedriver path is no longer hard-coded, improving portability.
 
 [0.4.0] - 2025-04-29
 Added

@@ -73,7 +73,7 @@ def get_menu(dining_hall):
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     # explicitly specify chromedriver path to avoid driver lookup issues
-    service = Service('/usr/bin/chromedriver')
+    service = Service()
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:

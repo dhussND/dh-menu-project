@@ -6,6 +6,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 [Unreleased] - yyyy-mm-dd
 Added
 (Future features or improvements can be listed here.)
+- Scraper now captures nutrition information for each menu item and stores it in Back4App.
 
 Changed
 (Future changes or refactoring can be listed here.)

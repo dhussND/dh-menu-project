@@ -38,3 +38,22 @@ npm install
 
 # Start the development server
 npm run dev
+```
+
+### Nutrition Information
+
+Each menu item on the dining hall website links to a detail page that lists
+nutritional values. The scraper now follows these links and stores the parsed
+values in Back4App.  Items in the `Menu` class contain an array of objects with
+the following structure:
+
+```json
+{
+  "name": "Hamburger",
+  "nutrition": {
+    "Calories": "250",
+    "Total Fat": "12g",
+    "Protein": "13g"
+  }
+}
+```

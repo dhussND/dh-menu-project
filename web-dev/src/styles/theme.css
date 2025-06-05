@@ -469,3 +469,9 @@ h5 {
 .btn-auth.btn-primary:hover {
     background-color: var(--nd-gold);
 }
+
+.nutrition-info {
+    font-size: 0.85rem;
+    color: var(--nd-gray);
+    margin: 0.25rem 0;
+}

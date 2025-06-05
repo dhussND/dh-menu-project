@@ -6,10 +6,9 @@ import time
 import requests
 from datetime import datetime
 import pytz
-from collections import defaultdict
+import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -28,9 +27,33 @@ LOW_PRIORITY_STATIONS = [
 
 def reorder_stations(menu_data):
     return sorted(
-        menu_data, 
+        menu_data,
         key=lambda x: (x['station'] in LOW_PRIORITY_STATIONS, )
     )
+
+
+def parse_nutrition_text(text: str) -> dict:
+    """Extract nutrition information from the nutrition label text."""
+    def match(pattern):
+        m = re.search(pattern, text, re.IGNORECASE)
+        return m.group(1).strip() if m else ""
+
+    data = {
+        "calories": match(r"Calories\s+(\d+)") or "",
+        "total_fat": match(r"Total Fat\s+([^\s]+)") or "",
+        "saturated_fat": match(r"Saturated Fat\s+([^\s]+)") or "",
+        "cholesterol": match(r"Cholesterol\s+([^\s]+)") or "",
+        "sodium": match(r"Sodium\s+([^\s]+)") or "",
+        "potassium": match(r"Potassium\s+([^\s]+)") or "",
+        "carbohydrates": match(r"Total Carbohydrate\s+([^\s]+)") or "",
+        "fiber": match(r"Dietary Fiber\s+([^\s]+)") or "",
+        "sugars": match(r"Sugars\s+([^\s]+)") or "",
+        "protein": match(r"Protein\s+([^\s]+)") or "",
+        "calcium": match(r"Calcium\s+([^\s]+)") or "",
+        "iron": match(r"Iron\s+([^\s]+)") or "",
+    }
+
+    return data
 
 def get_menu(dining_hall):
     chrome_options = Options()
@@ -71,47 +94,52 @@ def get_menu(dining_hall):
         food_by_stations = []
 
         for meal in meal_links:
-            station = None
             link = WebDriverWait(correct_day, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, meal)))
             link.click()
+
             itemTable = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "cbo_nn_itemGridTable")))
             rows = itemTable.find_elements(By.TAG_NAME, "tr")
-            
+
             current_station = None
-            current_items = []
-            
+
             for row in rows[1:]:
                 tds = row.find_elements(By.TAG_NAME, "td")
 
                 if len(tds) == 1:
-                    if current_station and current_items:
-                        food_by_stations.append({
-                            "meal": meal,
-                            "station": current_station,
-                            "items": current_items.copy(),
-                            "date": date,
-                            "diningHall": dining_hall
-                        })
-                    current_station = tds[0].text
-                    current_items = []
+                    current_station = tds[0].text.strip()
                 else:
                     item_name = tds[1].text.strip()
-                    if item_name:
-                        current_items.append(item_name)
-            
-            if current_station and current_items:
-                food_by_stations.append({
-                    "meal": meal,
-                    "station": current_station,
-                    "items": current_items,
-                    "date": date,
-                    "diningHall": dining_hall
-                })
+                    if not item_name:
+                        continue
+
+                    tds[1].click()
+                    label_table = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, "cbo_nn_NutritionLabelTable"))
+                    )
+                    nutrition = parse_nutrition_text(label_table.text)
+
+                    close_btn = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "btn_nn_detail_close"))
+                    )
+                    close_btn.click()
+                    WebDriverWait(driver, 10).until(EC.staleness_of(label_table))
+
+                    item_record = {
+                        "meal": meal,
+                        "station": current_station,
+                        "item": item_name,
+                        "date": date,
+                        "diningHall": dining_hall,
+                    }
+                    item_record.update(nutrition)
+                    food_by_stations.append(item_record)
 
             back_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "btn_Back1")))
             back_button.click()
 
-            menu_container = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "cbo_nn_menuCell")))
+            menu_container = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.CLASS_NAME, "cbo_nn_menuCell"))
+            )
             correct_day = get_menu_for_correct_day(menu_container)
 
         return food_by_stations

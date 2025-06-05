@@ -29,18 +29,33 @@ const Meal = () => {
       query.equalTo('meal', meal);
       query.equalTo('date', formattedDate);
       query.equalTo('diningHall', formattedDiningHall);
+      query.limit(1000);
       const results = await query.find();
 
-      // group menu items by station
+      // group menu items by station. Each record now represents a single item
       const groupedStations = results.reduce((acc, result) => {
         const station = result.get('station');
-        const items = result.get('items');
+        const item = {
+          name: result.get('item'),
+          calories: result.get('calories'),
+          total_fat: result.get('total_fat'),
+          saturated_fat: result.get('saturated_fat'),
+          cholesterol: result.get('cholesterol'),
+          sodium: result.get('sodium'),
+          potassium: result.get('potassium'),
+          carbohydrates: result.get('carbohydrates'),
+          fiber: result.get('fiber'),
+          sugars: result.get('sugars'),
+          protein: result.get('protein'),
+          calcium: result.get('calcium'),
+          iron: result.get('iron'),
+        };
         if (!acc[station]) acc[station] = [];
-        acc[station].push(...items);
+        acc[station].push(item);
         return acc;
       }, {});
 
-      const stationList = Object.keys(groupedStations).map(station => ({
+      const stationList = Object.keys(groupedStations).map((station) => ({
         name: station,
         items: groupedStations[station],
       }));
@@ -53,11 +68,12 @@ const Meal = () => {
 
   // filter stations based on the search query
   const filteredStations = stations
-    .map(station => ({
+    .map((station) => ({
       ...station,
-      items: station.items.filter(item =>
-        item.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        station.name.toLowerCase().includes(searchQuery.toLowerCase())
+      items: station.items.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          station.name.toLowerCase().includes(searchQuery.toLowerCase())
       ),
     }))
     .filter(station => station.items.length > 0);
@@ -81,9 +97,12 @@ const Meal = () => {
             <ul className="menu-list">
               {station.items.map((item, idx) => (
                 <li key={idx} className="menu-item">
-                  <strong>{item}</strong>
+                  <strong>{item.name}</strong>
+                  <div className="nutrition-info">
+                    Calories: {item.calories} | Total Fat: {item.total_fat} | Saturated Fat: {item.saturated_fat} | Cholesterol: {item.cholesterol} | Sodium: {item.sodium} | Potassium: {item.potassium} | Carbs: {item.carbohydrates} | Fiber: {item.fiber} | Sugars: {item.sugars} | Protein: {item.protein} | Calcium: {item.calcium} | Iron: {item.iron}
+                  </div>
                   <MenuItemReview
-                    foodItem={item}
+                    foodItem={item.name}
                     station={station.name}
                     diningHall={formattedDiningHall}
                   />

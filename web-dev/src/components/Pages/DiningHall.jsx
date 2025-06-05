@@ -24,6 +24,7 @@ const DiningHall = () => {
       const query = new Parse.Query('Menu');
       query.equalTo('date', formattedDate);
       query.equalTo('diningHall', formattedDiningHall);
+      query.limit(1000);
       const results = await query.find();
 
       // extract unique meals for the current day

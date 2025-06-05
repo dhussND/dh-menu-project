@@ -6,11 +6,9 @@ import time
 import requests
 from datetime import datetime
 import pytz
-from collections import defaultdict
 import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -51,18 +49,9 @@ def parse_nutrition_text(text: str) -> dict:
         "fiber": match(r"Dietary Fiber\s+([^\s]+)") or "",
         "sugars": match(r"Sugars\s+([^\s]+)") or "",
         "protein": match(r"Protein\s+([^\s]+)") or "",
-        "vitamin_a": match(r"Vitamin A\s+([^\s]+)") or "",
-        "vitamin_c": match(r"Vitamin C\s+([^\s]+)") or "",
         "calcium": match(r"Calcium\s+([^\s]+)") or "",
         "iron": match(r"Iron\s+([^\s]+)") or "",
     }
-
-    allergens_match = re.search(r"Allergens?:\s*(.*)", text, re.IGNORECASE)
-    if allergens_match:
-        allergens_str = allergens_match.group(1)
-        data["allergens"] = [a.strip() for a in allergens_str.split(',') if a.strip()]
-    else:
-        data["allergens"] = []
 
     return data
 

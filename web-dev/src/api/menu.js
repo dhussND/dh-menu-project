@@ -3,7 +3,13 @@ import Parse from 'parse';
 export const getAvailableDiningHalls = async () => {
   try {
     const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'America/New_York',
+    };
     const formattedDate = today.toLocaleDateString('en-US', options);
     
     const query = new Parse.Query('Menu');

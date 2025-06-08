@@ -17,7 +17,13 @@ const DiningHall = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       const today = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'America/New_York',
+      };
       const formattedDate = today.toLocaleDateString('en-US', options);
       setCurrentDate(formattedDate);
 

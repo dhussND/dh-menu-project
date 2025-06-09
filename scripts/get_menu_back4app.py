@@ -74,8 +74,20 @@ def get_menu(dining_hall):
             station = None
             link = WebDriverWait(correct_day, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, meal)))
             link.click()
-            itemTable = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "cbo_nn_itemGridTable")))
-            rows = itemTable.find_elements(By.TAG_NAME, "tr")
+            try:
+                itemTable = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "cbo_nn_itemGridTable")))
+                rows = itemTable.find_elements(By.TAG_NAME, "tr")
+            except Exception:
+                print(f"[{meal}] has no items listed. Skipping.")
+                # Return to previous menu view
+                back_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "btn_Back1")))
+                back_button.click()
+
+                # Refresh references to menu container and correct day
+                menu_container = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "cbo_nn_menuCell")))
+                correct_day = get_menu_for_correct_day(menu_container)
+                continue  # skip this meal
+
             
             current_station = None
             current_items = []

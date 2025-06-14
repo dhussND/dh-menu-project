@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { checkUser } from "./AuthService";
+import { checkUser, loginAsGuest } from "./AuthService";
 import "../../styles/theme.css";
 
 const Auth = () => {
@@ -13,6 +13,13 @@ const Auth = () => {
     }
   }, [navigate]);
 
+  const handleGuestLogin = async () => {
+    const guestUser = await loginAsGuest();
+    if (guestUser) {
+      navigate("/home");
+    }
+  };
+
   return (
     <div className="auth-landing">
       <div className="auth-container">
@@ -20,7 +27,7 @@ const Auth = () => {
         <p>
           Access dining menus for North and South Dining Halls.
           <br />
-          Please log in or register to continue.
+          Please log in, register, or continue as guest.
         </p>
 
         <div className="auth-buttons">
@@ -30,6 +37,12 @@ const Auth = () => {
           <Link to="/auth/login">
             <button className="btn-auth btn-login">Login</button>
           </Link>
+          <button 
+            onClick={handleGuestLogin}
+            className="btn-auth btn-guest"
+          >
+            Continue as Guest
+          </button>
         </div>
       </div>
     </div>

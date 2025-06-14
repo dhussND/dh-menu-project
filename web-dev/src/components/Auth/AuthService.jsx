@@ -54,3 +54,23 @@ export const logoutUser = async () => {
 export const checkUser = () => {
     return !!Parse.User.current();
 };
+
+export const loginAsGuest = async () => {
+    try {
+        // Create an anonymous user
+        const user = await Parse.User.signUp(
+            `guest_${Date.now()}`, // Generate unique username
+            'guest_password',      // Temporary password
+            {
+                email: `guest_${Date.now()}@guest.com`,
+                firstName: 'Guest',
+                lastName: 'User',
+                isGuest: true
+            }
+        );
+        return user;
+    } catch (error) {
+        alert(`Guest login failed: ${error.message}`);
+        return null;
+    }
+};

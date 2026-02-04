@@ -18,7 +18,7 @@ Notre Dame's dining hall website (https://dining.nd.edu) has several issues that
 
 ## Solution
 
-This project addresses these issues and introduces other improvements for a significantly better user experience. The core of the project is a Python script (`get_menu_back4app.py`) that scrapes the dining hall’s menu data and uploads it to a Back4App backend. The React frontend then delivers a refreshed, modern site with improved UX/UI.
+This project addresses these issues and introduces other improvements for a significantly better user experience. The core of the project is a Python script (`get_menu_nutrislice.py`) that pulls menu data from Nutrislice and uploads it to a Back4App backend. The React frontend then delivers a refreshed, modern site with improved UX/UI.
 
 ---
 

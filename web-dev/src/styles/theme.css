@@ -380,6 +380,40 @@ h5 {
     margin-bottom: 0.75rem;
 }
 
+.menu-item-meta {
+    margin-top: 0.35rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #444;
+}
+
+.menu-item-pill {
+    background-color: #f1f3f5;
+    border: 1px solid #e0e3e7;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+}
+
+.nutrition-details {
+    margin-top: 0.5rem;
+}
+
+.nutrition-details summary {
+    cursor: pointer;
+    color: var(--nd-blue);
+    font-weight: 600;
+}
+
+.nutrition-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.5rem 0 0;
+    display: grid;
+    gap: 0.25rem;
+}
+
 .menu-nav-buttons {
     margin-top: 2rem;
     display: flex;
@@ -468,4 +502,19 @@ h5 {
 
 .btn-auth.btn-primary:hover {
     background-color: var(--nd-gold);
+}
+
+.btn-guest {
+    background-color: #808080;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-guest:hover {
+    background-color: #666666;
 }

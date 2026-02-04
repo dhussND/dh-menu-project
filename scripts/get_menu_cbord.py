@@ -6,10 +6,8 @@ import time
 import requests
 from datetime import datetime
 import pytz
-from collections import defaultdict
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -134,7 +132,7 @@ def get_menu(dining_hall):
     finally:
         driver.quit()
 
-def upload_to_back4app(menu_data):
+def upload_to_back4app(menu_data, dining_hall):
     if not menu_data:
         print("No data to upload")
         return False
@@ -160,7 +158,7 @@ def upload_to_back4app(menu_data):
         query = {
             "where": json.dumps({
                 "date": today,
-                "diningHall": "South Dining Hall"
+                "diningHall": dining_hall
             })
         }
         response = requests.get(base_url, headers=headers, params=query)
@@ -208,7 +206,7 @@ def main():
                 menu_data = reorder_stations(menu_data)
 
                 print("Uploading to Back4App...")
-                if upload_to_back4app(menu_data):
+                if upload_to_back4app(menu_data, dining_hall):
                     print("Upload successful!")
                 else:
                     print("Upload completed with errors")

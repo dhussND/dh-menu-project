@@ -13,6 +13,13 @@ Changed
 Fixed
 (Future bug fixes can be listed here.)
 
+[1.0.0] - 2026-02-02
+Added
+- Added date selector to give users the ability to view dining hall offerings for the whole week rather than being limited to the current date.
+
+Changed
+- Changed from scraping CBORD net nutrition site to making an API call to retrieve menu data from Nutrislice, the new dining hall operations engagement platform.
+
 [0.4.0] - 2025-04-29
 Added
 - Added call to Parse API to automatically upload scraped data to back4app db.

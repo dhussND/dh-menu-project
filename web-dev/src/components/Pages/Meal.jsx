@@ -1,9 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import Parse from 'parse';
 import SearchBar from '../SearchBar';
 import '../../styles/theme.css';
 import MenuItemReview from '../Review/MenuItemReview';
+
+const DATE_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+const toIsoDate = (date) => {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+};
+
+const formatDisplayDate = (isoDate) => {
+  const date = isoDate ? new Date(`${isoDate}T12:00:00`) : new Date();
+  return date.toLocaleDateString('en-US', DATE_OPTIONS);
+};
 
 const getItemName = (item) => {
   if (!item) return '';
@@ -49,21 +61,32 @@ const formatNutrient = (nutrient) => {
 const Meal = () => {
   // get the dining hall and meal from the URL parameters
   const { diningHall, meal } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [stations, setStations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentDate, setCurrentDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
 
   const formattedDiningHall = diningHall
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
+  useEffect(() => {
+    const paramDate = searchParams.get('date');
+    const initialDate = paramDate || toIsoDate(new Date());
+    setSelectedDate(initialDate);
+  }, [searchParams]);
+
+  const formattedDate = useMemo(
+    () => formatDisplayDate(selectedDate),
+    [selectedDate]
+  );
+
   // fetch the menu items when the component mounts or when the meal/dining hall changes
   useEffect(() => {
     const fetchStations = async () => {
-      const today = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const formattedDate = today.toLocaleDateString('en-US', options);
+      if (!selectedDate) return;
       setCurrentDate(formattedDate);
 
       const query = new Parse.Query('Menu');
@@ -90,7 +113,13 @@ const Meal = () => {
     };
 
     fetchStations();
-  }, [meal, diningHall, formattedDiningHall]);
+  }, [meal, diningHall, formattedDiningHall, formattedDate, selectedDate]);
+
+  const handleDateChange = (event) => {
+    const value = event.target.value;
+    setSelectedDate(value);
+    setSearchParams(value ? { date: value } : {});
+  };
 
   // filter stations based on the search query
   const filteredStations = stations
@@ -110,6 +139,17 @@ const Meal = () => {
     <div className="menu-page">
       <h1>{meal} at {formattedDiningHall}</h1>
       <p className="subtext">Menu for {currentDate}</p>
+
+      <div className="date-picker-row">
+        <label className="date-picker-label" htmlFor="menu-date">Select date</label>
+        <input
+          id="menu-date"
+          className="date-picker-input"
+          type="date"
+          value={selectedDate}
+          onChange={handleDateChange}
+        />
+      </div>
 
       <SearchBar
         className="nd-search"
@@ -167,11 +207,11 @@ const Meal = () => {
           </details>
         ))
       ) : (
-        <p>No menu items available for today.</p>
+        <p>No menu items available for this date.</p>
       )}
 
       <div className="menu-nav-buttons">
-        <Link to={`/${diningHall}`}>
+        <Link to={`/${diningHall}?date=${selectedDate}`}>
           <button className="btn-auth btn-secondary btn-dining">Back to {formattedDiningHall}</button>
         </Link>
         <Link to="/home">

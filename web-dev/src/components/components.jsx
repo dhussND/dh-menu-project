@@ -20,6 +20,9 @@ export default function Components() {
         <Router>
             <div>
                 <Navbar />
+                <div className="site-banner">
+                    We are actively updating this site to match the new Nutrislice dining hall menu experience.
+                </div>
                 <main>
                     <Routes>
                         <Route path="/auth" element={<AuthModule />} />

@@ -131,14 +131,27 @@ def extract_text(value):
     return None
 
 
+def looks_like_category(item):
+    if not isinstance(item, dict):
+        return False
+    if any(key in item for key in ("items", "menu_items", "menu_items_by_category")):
+        if not any(
+            key in item for key in ("food", "menu_item", "menu_item_name", "nutrients", "allergens")
+        ):
+            return True
+    return False
+
+
 def extract_item_name(item):
     if not isinstance(item, dict):
         return None
+    if looks_like_category(item):
+        return None
     return (
-        extract_text(item.get("name"))
-        or extract_text(item.get("text"))
+        extract_text((item.get("food") or {}).get("name"))
         or extract_text(item.get("menu_item_name"))
-        or extract_text((item.get("food") or {}).get("name"))
+        or extract_text(item.get("name"))
+        or extract_text(item.get("text"))
     )
 
 
@@ -165,7 +178,14 @@ def extract_station(item, category_fallback=None):
 def extract_labels(item):
     if not isinstance(item, dict):
         return []
-    raw = item.get("labels") or item.get("dietary_flags") or item.get("tags")
+    raw = (
+        item.get("labels")
+        or item.get("dietary_flags")
+        or item.get("tags")
+        or (item.get("food") or {}).get("labels")
+        or (item.get("food") or {}).get("dietary_flags")
+        or (item.get("food") or {}).get("tags")
+    )
     if isinstance(raw, list):
         labels = []
         for label in raw:
@@ -183,44 +203,54 @@ def extract_nutrition(item):
         item.get("nutrients")
         or item.get("nutrition")
         or item.get("nutrition_info")
+        or (item.get("menu_item") or {}).get("nutrition")
+        or (item.get("menu_item") or {}).get("nutrition_info")
         or (item.get("food") or {}).get("nutrients")
         or (item.get("food") or {}).get("nutrition")
         or (item.get("food") or {}).get("nutrition_info")
     )
-    raw_allergens = item.get("allergens") or (item.get("food") or {}).get("allergens")
+    raw_allergens = (
+        item.get("allergens")
+        or (item.get("menu_item") or {}).get("allergens")
+        or (item.get("food") or {}).get("allergens")
+    )
     return normalize_nutrients(raw_nutrients), normalize_allergens(raw_allergens)
+
+
+def walk_menu_node(node, category_name=None):
+    if isinstance(node, dict):
+        if looks_like_category(node):
+            new_category = extract_text(node.get("category") or node.get("name")) or category_name
+            for key in ("items", "menu_items", "menu_items_by_category"):
+                child = node.get(key)
+                if isinstance(child, list):
+                    for item in child:
+                        yield from walk_menu_node(item, new_category)
+                elif isinstance(child, dict):
+                    for cat_name, items in child.items():
+                        if isinstance(items, list):
+                            for item in items:
+                                yield from walk_menu_node(item, cat_name)
+            return
+
+        yield node, category_name
+        return
+
+    if isinstance(node, list):
+        for item in node:
+            yield from walk_menu_node(item, category_name)
 
 
 def iter_menu_items(day):
     if not isinstance(day, dict):
         return
 
-    if isinstance(day.get("menu_items"), list):
-        for item in day["menu_items"]:
-            yield item, None
-        return
+    for node in day.get("menu_items") or []:
+        yield from walk_menu_node(node)
 
     menu_by_category = day.get("menu_items_by_category")
-    if isinstance(menu_by_category, list):
-        for category in menu_by_category:
-            if not isinstance(category, dict):
-                continue
-            category_name = extract_text(category.get("category") or category.get("name"))
-            items = (
-                category.get("menu_items")
-                or category.get("items")
-                or category.get("menu_items_by_category")
-            )
-            if isinstance(items, list):
-                for item in items:
-                    yield item, category_name
-        return
-
-    if isinstance(menu_by_category, dict):
-        for category_name, items in menu_by_category.items():
-            if isinstance(items, list):
-                for item in items:
-                    yield item, category_name
+    if menu_by_category:
+        yield from walk_menu_node(menu_by_category)
 
 
 def parse_day_date(day):
